@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gotvisor.com/sitemap.xml
+Sitemap: https://outketched.com/sitemap.xml
