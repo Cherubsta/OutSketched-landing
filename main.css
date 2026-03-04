@@ -9,55 +9,105 @@
 body {
 background: var(--white);
 color: var(--black);
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+font-family: 'Sedgwick Ave Display', regular, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+h2 {
+	font-size: 1.8rem;
+}
+
+p {
+	  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .hero {
-height: 100vh;
-background: var(--yellow);
+  background: var(--yellow);
+  padding-top: 80px;
+  padding-bottom: 80px;
 }
 
 .hero h1 {
-color: var(--black);
-font-weight: 800;
+  font-size: 4rem;
+  letter-spacing: 2px;
 }
 
-.hero p {
-font-size: 1.3rem;
+.hero-image {
+  max-width: 90%;
+  width: 100%;
+  margin: 10px auto 20px auto;
+  display: block;
 }
 
 .btn-appstore {
-background: var(--black);
-color: var(--white);
-border-radius: 999px;
-padding: 14px 36px;
-font-weight: 600;
-border: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #ffffff;
+  color: var(--black);
+  border: 3px solid var(--black);
+  border-radius: 999px;
+  padding: 14px 36px;
+  font-weight: 600;
 }
 
 .btn-appstore:hover {
-background: var(--blue);
+  background: var(--black);
+  color: #ffffff;
 }
 
 .features {
-background: var(--white);
+	background: var(--white);
 }
 
 .features h3 {
-font-weight: 700;
-margin-bottom: 12px;
+	font-weight: 700;
+	margin-bottom: 12px;
 }
 
 .feature-red {
-color: var(--red);
+	color: var(--red);
 }
 
 .feature-blue {
-color: var(--blue);
+	color: var(--blue);
 }
 
 footer {
-border-top: 1px solid #ddd;
-color: #777;
-background: var(--white);
+	border-top: 1px solid #ddd;
+	color: #777;
+	background: var(--white);
+}
+
+@media (max-width: 576px) {
+  .hero h1 {
+    font-size: 3.2rem;
+    margin-bottom: 10px;
+  }
+
+  .hero-image {
+    max-width: 115%;
+    margin-top: -60px;
+    margin-bottom: 0;
+    transform: translateX(30px);
+  }
+
+  .hero h2 {
+    margin-top: 50px;
+    margin-bottom: 50px;
+  }
+}
+
+@media (min-width: 577px) {
+  .hero-image {
+    max-width: 720px;
+    margin-top: -120px;
+    margin-bottom: 20px;
+    transform: translateX(54px);
+  }
+
+  .hero h1 {
+    margin-bottom: 20px;
+  }
+
+  .hero h2 {
+    margin-bottom: 30px;
+  }
 }
