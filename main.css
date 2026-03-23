@@ -23,7 +23,6 @@ p {
 }
 
 .hero {
-  /*background: var(--yellow);*/
   padding: 40px 0 60px 0;
 }
 
@@ -115,6 +114,10 @@ p {
   font-weight: heavy;
   margin-bottom: 10px;
   color: var(--blue);
+}
+
+.bg-yellow {
+  background: var(--yellow);
 }
 
 footer {
