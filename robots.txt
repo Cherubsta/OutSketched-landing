@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://outketched.com/sitemap.xml
+Sitemap: https://outsketched.com/sitemap.xml
