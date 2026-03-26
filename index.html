@@ -24,6 +24,7 @@
   <meta name="description" content="OutSketched is a fast-paced drawing battle game for friends and family. Race to sketch clues, shout the answer, and beat the other team before time runs out.">
   <meta name="keywords" content="Apple TV, drawing game, party game, sketch game, family game, team game, drawing challenge, guessing game">
   <meta name="author" content="Rainbox Studio">
+  <meta name="apple-itunes-app" content="app-id=6760415990, app-argument=https://outsketched.com">
 
   <!-- Open Graph (Facebook / Discord / Slack) -->
   <meta property="og:title" content="Out-Sketched: The Drawing Battle Game">
@@ -108,9 +109,12 @@
         A classic drawing and guessing game!
       </h1>
 
-      <button class="btn btn-appstore btn-lg" onclick="showBetaAlert()">
+      <a href="https://apps.apple.com/app/id6760415990" 
+         class="btn btn-appstore btn-lg"
+         target="_blank" 
+         rel="noopener">
         Download Game
-      </button>
+      </a>
 
     </div>
   </section>
@@ -182,16 +186,22 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="text-center py-4">
-    <p>© 2026 Rainbox Studio</p>
+  <footer class="footer py-4">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center text-center text-md-start">
+
+      <!-- Left -->
+      <div class="mb-2 mb-md-0">
+        &copy; 2026 Rainbox Studio
+      </div>
+
+      <!-- Right -->
+      <div class="d-flex gap-3">
+        <a href="/privacy" class="footer-link">Privacy</a>
+        <a href="mailto:support@outsketched.com" class="footer-link">Support</a>
+      </div>
+
+    </div>
   </footer>
-
-
-  <script>
-    function showBetaAlert() {
-      alert("OutSketched is currently in beta.\n\nApp Store download coming soon!");
-    }
-  </script>
 
   <script>
   document.addEventListener("DOMContentLoaded", () => {

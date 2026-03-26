@@ -193,6 +193,22 @@ footer {
   line-height: 1.6;
 } 
 
+.footer {
+  background: var(--white);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 1.2rem;
+}
+
+.footer-link {
+  text-decoration: none;
+  color: var(--black);
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  opacity: 0.6;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .site-header {
