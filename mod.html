@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Out Sketched — Word Bank</title>
+  <h3>OutSketched — Word Bank</h3>
 
   <style>
     :root {
@@ -136,13 +136,35 @@
       font-size: 14px;
     }
 
+    .words-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px 14px;
+    }
+
     .word-row {
       display: grid;
-      grid-template-columns: 1fr auto auto auto;
+      grid-template-columns: auto minmax(0, 1fr) auto;
       gap: 8px;
       align-items: center;
-      padding: 9px 0;
-      border-bottom: 1px solid var(--border);
+      min-height: 38px;
+    }
+
+    .word-row input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+
+    .word-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .word-row button {
+      padding: 6px 8px;
+      font-size: 13px;
     }
 
     .word-disabled {
@@ -150,15 +172,46 @@
       text-decoration: line-through;
     }
 
-    .toggle {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      font-size: 13px;
+    .word-row .edit-button {
+      white-space: nowrap;
     }
 
-    .toggle input {
-      width: auto;
+    .edit-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .edit-panel {
+      width: min(420px, 100%);
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+    }
+
+    .edit-panel h3 {
+      margin-top: 0;
+    }
+
+    .edit-panel input,
+    .edit-panel select {
+      margin-bottom: 10px;
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .edit-actions .danger {
+      margin-left: auto;
     }
 
     .hidden {
@@ -192,66 +245,66 @@
         grid-template-columns: 1fr;
       }
 
-      .word-row {
-        grid-template-columns: 1fr auto;
+      .words-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 5px 10px;
       }
 
-      .word-row .edit-button,
-      .word-row .delete-button {
-        grid-row: 2;
+      .card {
+        padding: 14px;
+        border-radius: 12px;
+      }
+
+      .category {
+        margin-top: 24px;
+      }
+
+      .category-header h2 {
+        font-size: 19px;
       }
     }
   </style>
 </head>
 
 <body>
-
   <!-- Lightweight local password gate -->
   <div id="loginCard" class="card">
     <h2>Word Bank Admin</h2>
     <p class="subtitle">Enter the admin password.</p>
-
     <input
       id="passwordInput"
       type="password"
       autocomplete="current-password"
       placeholder="Password"
     >
-
     <button id="passwordButton" class="primary" style="margin-top:10px;">
       Continue
     </button>
-
     <div id="passwordError" style="color:#b42318; margin-top:10px;"></div>
   </div>
 
 
   <main id="app" class="container hidden">
-
     <h1>Out Sketched — Word Bank</h1>
     <p class="subtitle">
       Manage the live CloudKit word bank.
     </p>
 
-    <section class="card">
-      <strong>CloudKit Account</strong>
-
-      <div id="apple-sign-in-button"></div>
-      <div id="apple-sign-out-button"></div>
-
-      <div id="authStatus" style="margin-top:10px; color:#777;">
-        Checking iCloud sign-in…
-      </div>
-    </section>
-
-
     <section id="editor" class="hidden">
+      <div class="card">
+        <div class="toolbar">
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search all words…"
+          >
+          <strong id="totalCount"></strong>
+        </div>
+      </div>
 
       <div class="card">
-
         <div class="field">
           <label for="newWords">Add Words</label>
-
           <textarea
             id="newWords"
             placeholder="dragon, knight, drawbridge, treasure chest"
@@ -259,48 +312,31 @@
         </div>
 
         <div class="row" style="margin-top:12px;">
-
           <div class="field">
             <label for="categorySelect">Category</label>
-
             <select id="categorySelect"></select>
           </div>
-
           <div></div>
-
           <button id="addButton" class="primary">
             Add Words
           </button>
-
         </div>
-
         <div id="status"></div>
       </div>
 
-
-      <div class="card">
-
-        <div class="toolbar">
-
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Search all words…"
-          >
-
-          <strong id="totalCount"></strong>
-
-        </div>
-
-      </div>
-
-
+      <div id="apple-sign-out-button"></div>
+      
       <div id="wordSections"></div>
 
     </section>
 
+    <section id="cloudKitLogin" class="card">
+      <div id="apple-sign-in-button"></div>
+      <div id="authStatus" style="color:#777;">
+        Checking iCloud sign-in…
+      </div>
+    </section>
   </main>
-
 
   <script>
     /*
@@ -315,26 +351,6 @@
     const CLOUDKIT_API_TOKEN = "faed4f2d018dac07c5ecf2bf50af0c1ecad8c9e457b10a1f2f2739e531e8dd8e";
 
     const CLOUDKIT_ENVIRONMENT = "development";
-
-    /*
-      This is deliberately only a lightweight client-side gate.
-
-      Replace this with your own SHA-256 password hash.
-
-      You can generate one in your browser console with:
-
-      crypto.subtle.digest(
-        "SHA-256",
-        new TextEncoder().encode("your-password")
-      ).then(buffer =>
-        console.log(
-          [...new Uint8Array(buffer)]
-            .map(b => b.toString(16).padStart(2, "0"))
-            .join("")
-        )
-      );
-
-    */
 
     const ADMIN_PASSWORD_HASH =
       "e9ea17b5ccd46a0497599f0d594517fbf1764bdddc7336af6107fb167a1a153a";
@@ -852,98 +868,201 @@
     */
 
     async function editWord(word) {
+      const existing =
+        document.getElementById("wordEditOverlay");
 
-      const newText =
-        prompt(
-          "Edit word:",
-          word.text
-        );
+      if (existing) {
+        existing.remove();
+      }
+
+      const overlay =
+        document.createElement("div");
+
+      overlay.id =
+        "wordEditOverlay";
+
+      overlay.className =
+        "edit-overlay";
 
 
-      if (newText === null) {
-        return;
+      const panel =
+        document.createElement("div");
+
+      panel.className =
+        "edit-panel";
+
+
+      const title =
+        document.createElement("h3");
+
+      title.textContent =
+        "Edit Word";
+
+
+      const textInput =
+        document.createElement("input");
+
+      textInput.type =
+        "text";
+
+      textInput.value =
+        word.text;
+
+
+      const categorySelect =
+        document.createElement("select");
+
+      for (const category of CATEGORIES) {
+        const option =
+          document.createElement("option");
+
+        option.value =
+          category;
+
+        option.textContent =
+          category;
+
+        option.selected =
+          category === word.category;
+
+        categorySelect.append(option);
       }
 
 
-      const trimmed =
-        newText.trim();
+      const buttons =
+        document.createElement("div");
+
+      buttons.className =
+        "edit-actions";
 
 
-      if (!trimmed) {
-        return;
-      }
+      const save =
+        document.createElement("button");
+
+      save.className =
+        "primary";
+
+      save.textContent =
+        "Save";
 
 
-      const categoryInput =
-        prompt(
-          "Category:",
-          word.category
-        );
+      const cancel =
+        document.createElement("button");
+
+      cancel.className =
+        "secondary";
+
+      cancel.textContent =
+        "Cancel";
 
 
-      if (categoryInput === null) {
-        return;
-      }
+      const del =
+        document.createElement("button");
+
+      del.className =
+        "danger";
+
+      del.textContent =
+        "Delete";
 
 
-      const newCategory =
-        categoryInput.trim();
+      cancel.addEventListener(
+        "click",
+        () => overlay.remove()
+      );
 
 
-      if (!CATEGORIES.includes(newCategory)) {
-
-        alert(
-          "Category must be one of:\n\n" +
-          CATEGORIES.join("\n")
-        );
-
-        return;
-      }
+      del.addEventListener(
+        "click",
+        async () => {
+          await deleteWord(word);
+          overlay.remove();
+        }
+      );
 
 
-      const updatedRecord = {
+      save.addEventListener(
+        "click",
+        async () => {
 
-        ...word.record,
+          const trimmed =
+            textInput.value.trim();
 
-        fields: {
+          if (!trimmed) {
+            return;
+          }
 
-          ...word.record.fields,
+          const updatedRecord = {
+            ...word.record,
 
-          text: {
-            value: trimmed
-          },
+            fields: {
+              ...word.record.fields,
 
-          category: {
-            value: newCategory
+              text: {
+                value: trimmed
+              },
+
+              category: {
+                value: categorySelect.value
+              }
+            }
+          };
+
+
+          try {
+
+            save.disabled = true;
+            save.textContent = "Saving…";
+
+            await database.saveRecords(
+              updatedRecord
+            );
+
+            overlay.remove();
+
+            await loadWords();
+
+            setStatus("Saved ✓");
+
+          } catch (error) {
+
+            console.error(error);
+
+            save.disabled = false;
+            save.textContent = "Save";
+
+            setStatus(
+              "Could not save changes.",
+              true
+            );
+
           }
 
         }
-
-      };
-
-
-      try {
-
-        await database.saveRecords(
-          updatedRecord
-        );
-
-        await loadWords();
-
-        setStatus("Saved ✓");
+      );
 
 
-      } catch (error) {
+      buttons.append(
+        save,
+        cancel,
+        del
+      );
 
-        console.error(error);
 
-        setStatus(
-          "Could not save changes.",
-          true
-        );
+      panel.append(
+        title,
+        textInput,
+        categorySelect,
+        buttons
+      );
 
-      }
 
+      overlay.append(panel);
+
+      document.body.append(overlay);
+
+      textInput.focus();
+      textInput.select();
     }
 
 
@@ -1000,22 +1119,15 @@
     function renderWords() {
 
       const container =
-        document.getElementById(
-          "wordSections"
-        );
-
+        document.getElementById("wordSections");
 
       const search =
-        document.getElementById(
-          "searchInput"
-        )
-        .value
-        .trim()
-        .toLowerCase();
-
+        document.getElementById("searchInput")
+          .value
+          .trim()
+          .toLowerCase();
 
       container.innerHTML = "";
-
 
       const filtered =
         allWords.filter(word =>
@@ -1023,7 +1135,6 @@
             .toLowerCase()
             .includes(search)
         );
-
 
       document.getElementById(
         "totalCount"
@@ -1035,10 +1146,8 @@
 
         const words =
           filtered.filter(
-            word =>
-              word.category === category
+            word => word.category === category
           );
-
 
         if (!words.length && search) {
           continue;
@@ -1081,8 +1190,14 @@
           count
         );
 
-
         section.append(header);
+
+
+        const grid =
+          document.createElement("div");
+
+        grid.className =
+          "words-grid";
 
 
         for (const word of words) {
@@ -1094,8 +1209,31 @@
             "word-row";
 
 
+          const checkbox =
+            document.createElement("input");
+
+          checkbox.type =
+            "checkbox";
+
+          checkbox.checked =
+            word.enabled;
+
+          checkbox.setAttribute(
+            "aria-label",
+            `Enable ${word.text}`
+          );
+
+          checkbox.addEventListener(
+            "change",
+            () => toggleWord(word)
+          );
+
+
           const label =
             document.createElement("div");
+
+          label.className =
+            "word-text";
 
           label.textContent =
             word.text;
@@ -1106,36 +1244,6 @@
               "word-disabled"
             );
           }
-
-
-          const toggleLabel =
-            document.createElement("label");
-
-          toggleLabel.className =
-            "toggle";
-
-
-          const checkbox =
-            document.createElement("input");
-
-          checkbox.type =
-            "checkbox";
-
-          checkbox.checked =
-            word.enabled;
-
-          checkbox.addEventListener(
-            "change",
-            () => toggleWord(word)
-          );
-
-
-          toggleLabel.append(
-            checkbox,
-            document.createTextNode(
-              " Enabled"
-            )
-          );
 
 
           const edit =
@@ -1153,33 +1261,15 @@
           );
 
 
-          const del =
-            document.createElement("button");
-
-          del.className =
-            "danger delete-button";
-
-          del.textContent =
-            "Delete";
-
-          del.addEventListener(
-            "click",
-            () => deleteWord(word)
-          );
-
-
           row.append(
+            checkbox,
             label,
-            toggleLabel,
-            edit,
-            del
+            edit
           );
-
-
-          section.append(row);
-
+          grid.append(row);
         }
 
+        section.append(grid);
 
         container.append(section);
 
