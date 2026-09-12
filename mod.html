@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <h3>OutSketched — Word Bank</h3>
+  <title>OutSketched — Word Bank</title>
 
   <style>
     :root {
@@ -144,15 +144,10 @@
 
     .word-row {
       display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
       align-items: center;
       min-height: 38px;
-    }
-
-    .word-row input[type="checkbox"] {
-      width: auto;
-      margin: 0;
     }
 
     .word-text {
@@ -212,6 +207,19 @@
 
     .edit-actions .danger {
       margin-left: auto;
+    }
+
+    .edit-enabled {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0 14px;
+      font-weight: 600;
+    }
+
+    .edit-enabled input {
+      width: auto;
+      margin: 0;
     }
 
     .hidden {
@@ -285,7 +293,7 @@
 
 
   <main id="app" class="container hidden">
-    <h1>Out Sketched — Word Bank</h1>
+    <h2>Out Sketched — Word Bank</h2>
     <p class="subtitle">
       Manage the live CloudKit word bank.
     </p>
@@ -323,10 +331,10 @@
         </div>
         <div id="status"></div>
       </div>
-
-      <div id="apple-sign-out-button"></div>
       
       <div id="wordSections"></div>
+
+      <div id="apple-sign-out-button"></div>
 
     </section>
 
@@ -816,51 +824,6 @@
 
     }
 
-
-    /*
-      ---------------------------------------------------
-      ENABLE / DISABLE
-      ---------------------------------------------------
-    */
-
-    async function toggleWord(word) {
-
-      const updatedRecord = {
-        ...word.record,
-
-        fields: {
-          ...word.record.fields,
-
-          enabled: {
-            value: word.enabled ? 0 : 1
-          }
-        }
-      };
-
-
-      try {
-
-        await database.saveRecords(
-          updatedRecord
-        );
-
-        await loadWords();
-
-
-      } catch (error) {
-
-        console.error(error);
-
-        setStatus(
-          "Could not update word.",
-          true
-        );
-
-      }
-
-    }
-
-
     /*
       ---------------------------------------------------
       EDIT
@@ -911,6 +874,28 @@
 
       const categorySelect =
         document.createElement("select");
+
+      const enabledLabel =
+        document.createElement("label");
+
+      enabledLabel.className =
+        "edit-enabled";
+
+
+      const enabledCheckbox =
+        document.createElement("input");
+
+      enabledCheckbox.type =
+        "checkbox";
+
+      enabledCheckbox.checked =
+        word.enabled;
+
+
+      enabledLabel.append(
+        enabledCheckbox,
+        document.createTextNode(" Enabled")
+      );
 
       for (const category of CATEGORIES) {
         const option =
@@ -975,8 +960,14 @@
       del.addEventListener(
         "click",
         async () => {
-          await deleteWord(word);
-          overlay.remove();
+
+          const deleted =
+            await deleteWord(word);
+
+          if (deleted) {
+            overlay.remove();
+          }
+
         }
       );
 
@@ -1004,10 +995,14 @@
 
               category: {
                 value: categorySelect.value
+              },
+
+              enabled: {
+                value:
+                  enabledCheckbox.checked ? 1 : 0
               }
             }
           };
-
 
           try {
 
@@ -1053,6 +1048,7 @@
         title,
         textInput,
         categorySelect,
+        enabledLabel,
         buttons
       );
 
@@ -1079,9 +1075,8 @@
           `Delete "${word.text}"?`
         );
 
-
       if (!confirmed) {
-        return;
+        return false;
       }
 
 
@@ -1095,6 +1090,8 @@
 
         setStatus("Deleted ✓");
 
+        return true;
+
 
       } catch (error) {
 
@@ -1104,6 +1101,8 @@
           "Could not delete word.",
           true
         );
+
+        return false;
 
       }
 
@@ -1208,27 +1207,6 @@
           row.className =
             "word-row";
 
-
-          const checkbox =
-            document.createElement("input");
-
-          checkbox.type =
-            "checkbox";
-
-          checkbox.checked =
-            word.enabled;
-
-          checkbox.setAttribute(
-            "aria-label",
-            `Enable ${word.text}`
-          );
-
-          checkbox.addEventListener(
-            "change",
-            () => toggleWord(word)
-          );
-
-
           const label =
             document.createElement("div");
 
@@ -1262,7 +1240,6 @@
 
 
           row.append(
-            checkbox,
             label,
             edit
           );
