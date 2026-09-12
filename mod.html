@@ -1425,10 +1425,54 @@
         suggestions.innerHTML = "";
 
         if (!matches.length) {
-          suggestions.innerHTML =
-            `<div class="search-suggestion">No matches</div>`;
 
-          suggestions.classList.remove("hidden");
+          const noMatch =
+            document.createElement("div");
+
+          noMatch.className =
+            "search-suggestion";
+
+          noMatch.innerHTML =
+            `No matches<br>
+             <strong>+ Add "${this.value.trim()}"</strong>`;
+
+          noMatch.addEventListener(
+            "click",
+            () => {
+
+              const word =
+                this.value.trim();
+
+              document.getElementById(
+                "newWords"
+              ).value = word;
+
+              // Dismiss keyboard
+              this.blur();
+
+              // Hide suggestions
+              suggestions.classList.add(
+                "hidden"
+              );
+
+              // Jump to Add Words field
+              document.getElementById(
+                "newWords"
+              ).scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+              });
+
+            }
+          );
+
+          suggestions.innerHTML = "";
+          suggestions.append(noMatch);
+
+          suggestions.classList.remove(
+            "hidden"
+          );
+
           return;
         }
 
