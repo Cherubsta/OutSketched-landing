@@ -1424,57 +1424,13 @@
 
         suggestions.innerHTML = "";
 
-        if (!matches.length) {
-
-          const noMatch =
-            document.createElement("div");
-
-          noMatch.className =
-            "search-suggestion";
-
-          noMatch.innerHTML =
-            `No matches<br>
-             <strong>+ Add "${this.value.trim()}"</strong>`;
-
-          noMatch.addEventListener(
-            "click",
-            () => {
-
-              const word =
-                this.value.trim();
-
-              document.getElementById(
-                "newWords"
-              ).value = word;
-
-              // Dismiss keyboard
-              this.blur();
-
-              // Hide suggestions
-              suggestions.classList.add(
-                "hidden"
-              );
-
-              // Jump to Add Words field
-              document.getElementById(
-                "newWords"
-              ).scrollIntoView({
-                behavior: "smooth",
-                block: "center"
-              });
-
-            }
+        const exactMatch =
+          allWords.some(
+            word =>
+              word.text
+                .trim()
+                .toLowerCase() === search
           );
-
-          suggestions.innerHTML = "";
-          suggestions.append(noMatch);
-
-          suggestions.classList.remove(
-            "hidden"
-          );
-
-          return;
-        }
 
         for (const word of matches) {
 
@@ -1493,6 +1449,46 @@
           );
 
           suggestions.append(item);
+        }
+
+        if (!exactMatch) {
+
+          const addItem =
+            document.createElement("div");
+
+          addItem.className =
+            "search-suggestion";
+
+          addItem.innerHTML =
+            `<strong>+ Add "${this.value.trim()}"</strong>`;
+
+          addItem.addEventListener(
+            "click",
+            () => {
+
+              const word =
+                this.value.trim();
+
+              document.getElementById(
+                "newWords"
+              ).value = word;
+
+              this.blur();
+
+              suggestions.classList.add(
+                "hidden"
+              );
+
+              document.getElementById(
+                "newWords"
+              ).scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+              });
+            }
+          );
+
+          suggestions.append(addItem);
         }
 
         suggestions.classList.remove("hidden");
