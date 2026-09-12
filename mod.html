@@ -1455,6 +1455,21 @@
 
       });
 
+      document.addEventListener("touchstart", function (event) {
+        const searchWrap =
+          document.querySelector(".search-wrap");
+
+        const searchInput =
+          document.getElementById("searchInput");
+
+        if (
+          document.activeElement === searchInput &&
+          !searchWrap.contains(event.target)
+        ) {
+          searchInput.blur();
+        }
+      });
+
   </script>
 
 
