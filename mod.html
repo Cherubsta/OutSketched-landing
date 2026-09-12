@@ -246,6 +246,30 @@
       display: none !important;
     }
 
+    .search-suggestions {
+      margin-top: 6px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      overflow: hidden;
+    }
+
+    .search-suggestion {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+
+    .search-suggestion:last-child {
+      border-bottom: 0;
+    }
+
+    .search-suggestion small {
+      display: block;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
     #loginCard {
       max-width: 420px;
       margin: 80px auto;
@@ -329,6 +353,7 @@
             type="search"
             placeholder="Search all words…"
           >
+          <div id="searchSuggestions" class="search-suggestions hidden"></div>
           <strong id="totalCount"></strong>
         </div>
       </div>
@@ -1347,6 +1372,69 @@
         "input",
         renderWords
       );
+
+    // Event listeners
+    document
+      .getElementById("searchInput")
+      .addEventListener("input", function () {
+
+        renderWords();
+
+        const search =
+          this.value.trim().toLowerCase();
+
+        const suggestions =
+          document.getElementById(
+            "searchSuggestions"
+          );
+
+        if (!search) {
+          suggestions.classList.add("hidden");
+          suggestions.innerHTML = "";
+          return;
+        }
+
+        const matches =
+          allWords
+            .filter(word =>
+              word.text
+                .toLowerCase()
+                .includes(search)
+            )
+            .slice(0, 8);
+
+        suggestions.innerHTML = "";
+
+        if (!matches.length) {
+          suggestions.innerHTML =
+            `<div class="search-suggestion">No matches</div>`;
+
+          suggestions.classList.remove("hidden");
+          return;
+        }
+
+        for (const word of matches) {
+
+          const item =
+            document.createElement("div");
+
+          item.className =
+            "search-suggestion";
+
+          item.innerHTML =
+            `${word.text}<small>${word.category}</small>`;
+
+          item.addEventListener(
+            "click",
+            () => editWord(word)
+          );
+
+          suggestions.append(item);
+        }
+
+        suggestions.classList.remove("hidden");
+
+      });
 
   </script>
 
