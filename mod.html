@@ -246,12 +246,23 @@
       display: none !important;
     }
 
+    .search-wrap {
+      position: relative;
+      min-width: 0;
+    }
+
     .search-suggestions {
-      margin-top: 6px;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 100;
+
       background: white;
       border: 1px solid var(--border);
       border-radius: 9px;
       overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
     }
 
     .search-suggestion {
@@ -348,13 +359,21 @@
     <section id="editor" class="hidden">
       <div class="card">
         <div class="toolbar">
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Search all words…"
-          >
-          <div id="searchSuggestions" class="search-suggestions hidden"></div>
+
+          <div class="search-wrap">
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="Search all words…"
+            >
+            <div
+              id="searchSuggestions"
+              class="search-suggestions hidden">
+            </div>
+          </div>
+
           <strong id="totalCount"></strong>
+
         </div>
       </div>
 
