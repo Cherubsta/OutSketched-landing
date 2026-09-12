@@ -1,0 +1,1268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Out Sketched — Word Bank</title>
+
+  <style>
+    :root {
+      --bg: #f4f1e8;
+      --panel: #fffdf7;
+      --text: #191919;
+      --muted: #777;
+      --border: #d8d2c4;
+      --danger: #b42318;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      width: min(1000px, calc(100% - 32px));
+      margin: 40px auto 80px;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 0;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    input,
+    textarea,
+    select,
+    button {
+      font: inherit;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 11px 12px;
+      background: white;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .primary {
+      background: #191919;
+      color: white;
+    }
+
+    .secondary {
+      background: #e9e5db;
+    }
+
+    .danger {
+      color: var(--danger);
+      background: transparent;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 220px auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    #status {
+      margin-top: 12px;
+      color: var(--muted);
+      min-height: 20px;
+    }
+
+    .category {
+      margin-top: 30px;
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 2px solid var(--text);
+      padding-bottom: 8px;
+      margin-bottom: 6px;
+    }
+
+    .category-header h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .word-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 8px;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .word-disabled {
+      opacity: .45;
+      text-decoration: line-through;
+    }
+
+    .toggle {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .toggle input {
+      width: auto;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #loginCard {
+      max-width: 420px;
+      margin: 80px auto;
+    }
+
+    #apple-sign-in-button,
+    #apple-sign-out-button {
+      margin-top: 12px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    @media (max-width: 700px) {
+      .container {
+        width: min(100% - 20px, 1000px);
+        margin-top: 20px;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .word-row {
+        grid-template-columns: 1fr auto;
+      }
+
+      .word-row .edit-button,
+      .word-row .delete-button {
+        grid-row: 2;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Lightweight local password gate -->
+  <div id="loginCard" class="card">
+    <h2>Word Bank Admin</h2>
+    <p class="subtitle">Enter the admin password.</p>
+
+    <input
+      id="passwordInput"
+      type="password"
+      autocomplete="current-password"
+      placeholder="Password"
+    >
+
+    <button id="passwordButton" class="primary" style="margin-top:10px;">
+      Continue
+    </button>
+
+    <div id="passwordError" style="color:#b42318; margin-top:10px;"></div>
+  </div>
+
+
+  <main id="app" class="container hidden">
+
+    <h1>Out Sketched — Word Bank</h1>
+    <p class="subtitle">
+      Manage the live CloudKit word bank.
+    </p>
+
+    <section class="card">
+      <strong>CloudKit Account</strong>
+
+      <div id="apple-sign-in-button"></div>
+      <div id="apple-sign-out-button"></div>
+
+      <div id="authStatus" style="margin-top:10px; color:#777;">
+        Checking iCloud sign-in…
+      </div>
+    </section>
+
+
+    <section id="editor" class="hidden">
+
+      <div class="card">
+
+        <div class="field">
+          <label for="newWords">Add Words</label>
+
+          <textarea
+            id="newWords"
+            placeholder="dragon, knight, drawbridge, treasure chest"
+          ></textarea>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+
+          <div class="field">
+            <label for="categorySelect">Category</label>
+
+            <select id="categorySelect"></select>
+          </div>
+
+          <div></div>
+
+          <button id="addButton" class="primary">
+            Add Words
+          </button>
+
+        </div>
+
+        <div id="status"></div>
+      </div>
+
+
+      <div class="card">
+
+        <div class="toolbar">
+
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search all words…"
+          >
+
+          <strong id="totalCount"></strong>
+
+        </div>
+
+      </div>
+
+
+      <div id="wordSections"></div>
+
+    </section>
+
+  </main>
+
+
+  <script>
+    /*
+      ---------------------------------------------------
+      CONFIGURATION
+      ---------------------------------------------------
+    */
+
+    const CLOUDKIT_CONTAINER = "iCloud.dev.rainbox.OutSketched";
+
+    // Create this in CloudKit Console → API Access.
+    const CLOUDKIT_API_TOKEN = "faed4f2d018dac07c5ecf2bf50af0c1ecad8c9e457b10a1f2f2739e531e8dd8e";
+
+    const CLOUDKIT_ENVIRONMENT = "development";
+
+    /*
+      This is deliberately only a lightweight client-side gate.
+
+      Replace this with your own SHA-256 password hash.
+
+      You can generate one in your browser console with:
+
+      crypto.subtle.digest(
+        "SHA-256",
+        new TextEncoder().encode("your-password")
+      ).then(buffer =>
+        console.log(
+          [...new Uint8Array(buffer)]
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("")
+        )
+      );
+
+    */
+
+    const ADMIN_PASSWORD_HASH =
+      "Pe9ea17b5ccd46a0497599f0d594517fbf1764bdddc7336af6107fb167a1a153a";
+
+
+    const CATEGORIES = [
+      "Creatures",
+      "Food & Kitchen",
+      "Everyday Objects",
+      "Places",
+      "Sports",
+      "Nature",
+      "Transportation",
+      "Human Body"
+    ];
+
+
+    /*
+      ---------------------------------------------------
+      LOCAL PASSWORD GATE
+      ---------------------------------------------------
+    */
+
+    const ADMIN_AUTH_KEY = "outsketched_wordbank_admin";
+
+    async function sha256(text) {
+
+      const data =
+        new TextEncoder().encode(text);
+
+      const hashBuffer =
+        await crypto.subtle.digest("SHA-256", data);
+
+      return [...new Uint8Array(hashBuffer)]
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+
+    async function attemptPassword() {
+
+      const input =
+        document.getElementById("passwordInput").value;
+
+      const hash =
+        await sha256(input);
+
+      if (hash === ADMIN_PASSWORD_HASH) {
+
+        localStorage.setItem(
+          ADMIN_AUTH_KEY,
+          ADMIN_PASSWORD_HASH
+        );
+
+        showApp();
+
+      } else {
+
+        document.getElementById("passwordError")
+          .textContent = "Incorrect password.";
+
+      }
+    }
+
+
+    function showApp() {
+
+      document.getElementById("loginCard")
+        .classList.add("hidden");
+
+      document.getElementById("app")
+        .classList.remove("hidden");
+
+      initializeCloudKit();
+    }
+
+
+    document.getElementById("passwordButton")
+      .addEventListener("click", attemptPassword);
+
+
+    document.getElementById("passwordInput")
+      .addEventListener("keydown", event => {
+
+        if (event.key === "Enter") {
+          attemptPassword();
+        }
+
+      });
+
+
+    if (
+      localStorage.getItem(ADMIN_AUTH_KEY) ===
+      ADMIN_PASSWORD_HASH
+    ) {
+      showApp();
+    }
+
+
+    /*
+      ---------------------------------------------------
+      CLOUDKIT
+      ---------------------------------------------------
+    */
+
+    let container;
+    let database;
+
+    let allWords = [];
+
+
+    window.addEventListener(
+      "cloudkitloaded",
+      () => {
+
+        // If password gate already passed,
+        // initializeCloudKit() will configure it.
+
+      }
+    );
+
+
+    async function initializeCloudKit() {
+
+      if (!window.CloudKit) {
+
+        // CloudKit script may still be loading.
+        setTimeout(initializeCloudKit, 100);
+        return;
+
+      }
+
+      CloudKit.configure({
+
+        locale: "en-us",
+
+        containers: [{
+
+          containerIdentifier:
+            CLOUDKIT_CONTAINER,
+
+          apiTokenAuth: {
+
+            apiToken:
+              CLOUDKIT_API_TOKEN,
+
+            persist: true,
+
+            signInButton: {
+              id: "apple-sign-in-button",
+              theme: "black"
+            },
+
+            signOutButton: {
+              id: "apple-sign-out-button",
+              theme: "black"
+            }
+
+          },
+
+          environment:
+            CLOUDKIT_ENVIRONMENT
+
+        }]
+
+      });
+
+
+      container =
+        CloudKit.getDefaultContainer();
+
+      database =
+        container.publicCloudDatabase;
+
+
+      try {
+
+        const identity =
+          await container.setUpAuth();
+
+        handleIdentity(identity);
+
+
+        container.whenUserSignsIn()
+          .then(identity => {
+
+            handleIdentity(identity);
+
+          });
+
+
+        container.whenUserSignsOut()
+          .then(() => {
+
+            handleIdentity(null);
+
+          });
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        document.getElementById("authStatus")
+          .textContent =
+          "Unable to initialize iCloud authentication.";
+
+      }
+
+    }
+
+
+    async function handleIdentity(identity) {
+
+      const authStatus =
+        document.getElementById("authStatus");
+
+      const editor =
+        document.getElementById("editor");
+
+
+      if (!identity) {
+
+        authStatus.textContent =
+          "Sign in to iCloud to manage words.";
+
+        editor.classList.add("hidden");
+
+        return;
+
+      }
+
+
+      authStatus.textContent =
+        "Signed in to iCloud.";
+
+      editor.classList.remove("hidden");
+
+
+      try {
+
+        await loadWords();
+
+      } catch (error) {
+
+        console.error(error);
+
+        setStatus(
+          "Could not load words from CloudKit.",
+          true
+        );
+
+      }
+
+    }
+
+
+    /*
+      ---------------------------------------------------
+      LOAD WORDS
+      ---------------------------------------------------
+    */
+
+    async function loadWords() {
+      setStatus("Loading words…");
+
+      try {
+        let response = await database.performQuery({
+          recordType: "Word"
+        });
+
+        let records = [...(response.records || [])];
+
+        while (response.moreComing || response.continuationMarker) {
+          response = await database.performQuery(response);
+
+          if (response.records?.length) {
+            records.push(...response.records);
+          }
+        }
+
+        allWords = records.map(record => ({
+          record,
+
+          text:
+            record.fields?.text?.value ?? "",
+
+          category:
+            record.fields?.category?.value ?? "",
+
+          enabled:
+            Number(
+              record.fields?.enabled?.value ?? 1
+            ) === 1
+        }));
+
+        allWords.sort((a, b) =>
+          a.text.localeCompare(
+            b.text,
+            undefined,
+            { sensitivity: "base" }
+          )
+        );
+
+        renderWords();
+
+        console.log(
+          `[WordBank Admin] Loaded ${allWords.length} CloudKit words`
+        );
+
+        setStatus("");
+
+      } catch (error) {
+        console.error(
+          "[WordBank Admin] Failed to load words:",
+          error
+        );
+
+        setStatus(
+          "Could not load words from CloudKit.",
+          true
+        );
+
+        throw error;
+      }
+    }
+
+
+    /*
+      ---------------------------------------------------
+      ADD WORDS
+      ---------------------------------------------------
+    */
+
+    async function addWords() {
+
+      const raw =
+        document.getElementById("newWords")
+          .value;
+
+      const category =
+        document.getElementById("categorySelect")
+          .value;
+
+
+      const incoming =
+        raw
+          .split(",")
+          .map(word => word.trim())
+          .filter(Boolean);
+
+
+      if (!incoming.length) {
+        setStatus("Enter at least one word.", true);
+        return;
+      }
+
+
+      const uniqueIncoming =
+        [...new Map(
+          incoming.map(word => [
+            word.toLowerCase(),
+            word
+          ])
+        ).values()];
+
+
+      const existing =
+        new Set(
+          allWords
+            .filter(word =>
+              word.category === category
+            )
+            .map(word =>
+              word.text.toLowerCase()
+            )
+        );
+
+
+      const toAdd =
+        uniqueIncoming.filter(
+          word =>
+            !existing.has(
+              word.toLowerCase()
+            )
+        );
+
+
+      const skipped =
+        uniqueIncoming.length -
+        toAdd.length;
+
+
+      if (!toAdd.length) {
+
+        setStatus(
+          `${skipped} duplicate${skipped === 1 ? "" : "s"} skipped.`
+        );
+
+        return;
+
+      }
+
+
+      setStatus(
+        `Adding ${toAdd.length} word${toAdd.length === 1 ? "" : "s"}…`
+      );
+
+
+      const records =
+        toAdd.map(word => ({
+
+          recordType: "Word",
+
+          fields: {
+
+            text: {
+              value: word
+            },
+
+            category: {
+              value: category
+            },
+
+            enabled: {
+              value: 1
+            }
+
+          }
+
+        }));
+
+
+      try {
+
+        await database.saveRecords(records);
+
+        document.getElementById("newWords")
+          .value = "";
+
+        await loadWords();
+
+
+        setStatus(
+          `${toAdd.length} added` +
+          (skipped
+            ? ` · ${skipped} duplicate${skipped === 1 ? "" : "s"} skipped`
+            : "") +
+          " ✓"
+        );
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        setStatus(
+          "Could not add words.",
+          true
+        );
+
+      }
+
+    }
+
+
+    /*
+      ---------------------------------------------------
+      ENABLE / DISABLE
+      ---------------------------------------------------
+    */
+
+    async function toggleWord(word) {
+
+      const updatedRecord = {
+        ...word.record,
+
+        fields: {
+          ...word.record.fields,
+
+          enabled: {
+            value: word.enabled ? 0 : 1
+          }
+        }
+      };
+
+
+      try {
+
+        await database.saveRecords(
+          updatedRecord
+        );
+
+        await loadWords();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        setStatus(
+          "Could not update word.",
+          true
+        );
+
+      }
+
+    }
+
+
+    /*
+      ---------------------------------------------------
+      EDIT
+      ---------------------------------------------------
+    */
+
+    async function editWord(word) {
+
+      const newText =
+        prompt(
+          "Edit word:",
+          word.text
+        );
+
+
+      if (newText === null) {
+        return;
+      }
+
+
+      const trimmed =
+        newText.trim();
+
+
+      if (!trimmed) {
+        return;
+      }
+
+
+      const categoryInput =
+        prompt(
+          "Category:",
+          word.category
+        );
+
+
+      if (categoryInput === null) {
+        return;
+      }
+
+
+      const newCategory =
+        categoryInput.trim();
+
+
+      if (!CATEGORIES.includes(newCategory)) {
+
+        alert(
+          "Category must be one of:\n\n" +
+          CATEGORIES.join("\n")
+        );
+
+        return;
+      }
+
+
+      const updatedRecord = {
+
+        ...word.record,
+
+        fields: {
+
+          ...word.record.fields,
+
+          text: {
+            value: trimmed
+          },
+
+          category: {
+            value: newCategory
+          }
+
+        }
+
+      };
+
+
+      try {
+
+        await database.saveRecords(
+          updatedRecord
+        );
+
+        await loadWords();
+
+        setStatus("Saved ✓");
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        setStatus(
+          "Could not save changes.",
+          true
+        );
+
+      }
+
+    }
+
+
+    /*
+      ---------------------------------------------------
+      DELETE
+      ---------------------------------------------------
+    */
+
+    async function deleteWord(word) {
+
+      const confirmed =
+        confirm(
+          `Delete "${word.text}"?`
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      try {
+
+        await database.deleteRecords([
+          word.record.recordName
+        ]);
+
+        await loadWords();
+
+        setStatus("Deleted ✓");
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        setStatus(
+          "Could not delete word.",
+          true
+        );
+
+      }
+
+    }
+
+
+    /*
+      ---------------------------------------------------
+      RENDER
+      ---------------------------------------------------
+    */
+
+    function renderWords() {
+
+      const container =
+        document.getElementById(
+          "wordSections"
+        );
+
+
+      const search =
+        document.getElementById(
+          "searchInput"
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+
+      container.innerHTML = "";
+
+
+      const filtered =
+        allWords.filter(word =>
+          word.text
+            .toLowerCase()
+            .includes(search)
+        );
+
+
+      document.getElementById(
+        "totalCount"
+      ).textContent =
+        `${allWords.length} words`;
+
+
+      for (const category of CATEGORIES) {
+
+        const words =
+          filtered.filter(
+            word =>
+              word.category === category
+          );
+
+
+        if (!words.length && search) {
+          continue;
+        }
+
+
+        const section =
+          document.createElement("section");
+
+        section.className =
+          "category card";
+
+
+        const header =
+          document.createElement("div");
+
+        header.className =
+          "category-header";
+
+
+        const heading =
+          document.createElement("h2");
+
+        heading.textContent =
+          category;
+
+
+        const count =
+          document.createElement("span");
+
+        count.className =
+          "count";
+
+        count.textContent =
+          `${words.length} word${words.length === 1 ? "" : "s"}`;
+
+
+        header.append(
+          heading,
+          count
+        );
+
+
+        section.append(header);
+
+
+        for (const word of words) {
+
+          const row =
+            document.createElement("div");
+
+          row.className =
+            "word-row";
+
+
+          const label =
+            document.createElement("div");
+
+          label.textContent =
+            word.text;
+
+
+          if (!word.enabled) {
+            label.classList.add(
+              "word-disabled"
+            );
+          }
+
+
+          const toggleLabel =
+            document.createElement("label");
+
+          toggleLabel.className =
+            "toggle";
+
+
+          const checkbox =
+            document.createElement("input");
+
+          checkbox.type =
+            "checkbox";
+
+          checkbox.checked =
+            word.enabled;
+
+          checkbox.addEventListener(
+            "change",
+            () => toggleWord(word)
+          );
+
+
+          toggleLabel.append(
+            checkbox,
+            document.createTextNode(
+              " Enabled"
+            )
+          );
+
+
+          const edit =
+            document.createElement("button");
+
+          edit.className =
+            "secondary edit-button";
+
+          edit.textContent =
+            "Edit";
+
+          edit.addEventListener(
+            "click",
+            () => editWord(word)
+          );
+
+
+          const del =
+            document.createElement("button");
+
+          del.className =
+            "danger delete-button";
+
+          del.textContent =
+            "Delete";
+
+          del.addEventListener(
+            "click",
+            () => deleteWord(word)
+          );
+
+
+          row.append(
+            label,
+            toggleLabel,
+            edit,
+            del
+          );
+
+
+          section.append(row);
+
+        }
+
+
+        container.append(section);
+
+      }
+
+    }
+
+
+    /*
+      ---------------------------------------------------
+      UI HELPERS
+      ---------------------------------------------------
+    */
+
+    function populateCategories() {
+
+      const select =
+        document.getElementById(
+          "categorySelect"
+        );
+
+
+      CATEGORIES.forEach(category => {
+
+        const option =
+          document.createElement("option");
+
+        option.value =
+          category;
+
+        option.textContent =
+          category;
+
+        select.append(option);
+
+      });
+
+    }
+
+
+    function setStatus(
+      message,
+      isError = false
+    ) {
+
+      const status =
+        document.getElementById("status");
+
+      status.textContent =
+        message;
+
+      status.style.color =
+        isError
+          ? "#b42318"
+          : "#777";
+
+    }
+
+
+    populateCategories();
+
+
+    document.getElementById("addButton")
+      .addEventListener(
+        "click",
+        addWords
+      );
+
+
+    document.getElementById("searchInput")
+      .addEventListener(
+        "input",
+        renderWords
+      );
+
+  </script>
+
+
+  <!-- Apple CloudKit JS -->
+  <script
+    src="https://cdn.apple-cloudkit.com/ck/2/cloudkit.js"
+    async>
+  </script>
+
+</body>
+</html>
