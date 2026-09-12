@@ -136,6 +136,22 @@
       font-size: 14px;
     }
 
+    .admin-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-heading img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    .admin-heading h2 {
+      margin: 0;
+    }
+
     .words-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -144,7 +160,7 @@
 
     .word-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: auto minmax(0, 1fr);
       gap: 8px;
       align-items: center;
       min-height: 38px;
@@ -293,9 +309,12 @@
 
 
   <main id="app" class="container hidden">
-    <h2>Out Sketched — Word Bank</h2>
+    <div class="admin-heading">
+      <img src="assets/brand-icon.png" alt="">
+      <h2>OutSketched: Word Bank</h2>
+    </div>
     <p class="subtitle">
-      Manage the live CloudKit word bank.
+      Manage the live word bank. Add words, edit, enable/disable, and  adjust categories.
     </p>
 
     <section id="editor" class="hidden">
@@ -312,7 +331,7 @@
 
       <div class="card">
         <div class="field">
-          <label for="newWords">Add Words</label>
+          <label for="newWords">Add Word(s)</label>
           <textarea
             id="newWords"
             placeholder="dragon, knight, drawbridge, treasure chest"
@@ -334,8 +353,6 @@
       
       <div id="wordSections"></div>
 
-      <div id="apple-sign-out-button"></div>
-
     </section>
 
     <section id="cloudKitLogin" class="card">
@@ -344,6 +361,11 @@
         Checking iCloud sign-in…
       </div>
     </section>
+
+    <section>
+      <div id="apple-sign-out-button"></div>
+    </section>
+
   </main>
 
   <script>
@@ -1240,8 +1262,8 @@
 
 
           row.append(
-            label,
-            edit
+            edit,
+            label
           );
           grid.append(row);
         }
