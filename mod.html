@@ -1524,19 +1524,22 @@
 
       });
 
-      document.addEventListener("touchstart", function (event) {
+      document.addEventListener("pointerdown", function (event) {
+
         const searchWrap =
           document.querySelector(".search-wrap");
 
         const searchInput =
           document.getElementById("searchInput");
 
-        if (
-          document.activeElement === searchInput &&
-          !searchWrap.contains(event.target)
-        ) {
+        const suggestions =
+          document.getElementById("searchSuggestions");
+
+        if (!searchWrap.contains(event.target)) {
           searchInput.blur();
+          suggestions.classList.add("hidden");
         }
+
       });
 
   </script>
