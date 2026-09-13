@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>OutSketched Word Bank Migration</title>
+
+  <script src="https://cdn.apple-cloudkit.com/ck/2/cloudkit.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      background: #f4f1e8;
+      color: #191919;
+    }
+
+    .container {
+      width: min(640px, calc(100% - 32px));
+      margin: 50px auto;
+    }
+
+    .card {
+      background: #fffdf7;
+      border: 1px solid #d8d2c4;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 26px;
+    }
+
+    p {
+      line-height: 1.5;
+    }
+
+    .warning {
+      font-weight: 600;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      margin: 18px 0;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 600;
+      background: #191919;
+      color: white;
+    }
+
+    button:disabled {
+      opacity: .4;
+      cursor: default;
+    }
+
+    #status {
+      margin-top: 18px;
+      white-space: pre-line;
+      line-height: 1.5;
+    }
+
+    #apple-sign-in-button,
+    #apple-sign-out-button {
+      margin-top: 16px;
+    }
+
+    progress {
+      width: 100%;
+      height: 18px;
+      margin-top: 18px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="card">
+    <h1>Word Bank Migration</h1>
+
+    <p class="warning">
+      Development → Production
+    </p>
+
+    <p>
+      Import the exported Development word bank into the
+      Production CloudKit database.
+    </p>
+
+    <div id="apple-sign-in-button"></div>
+    <div id="apple-sign-out-button"></div>
+  </div>
+
+  <div id="migrationCard" class="card hidden">
+
+    <strong>1. Choose Development export</strong>
+
+    <input
+      id="jsonFile"
+      type="file"
+      accept=".json,application/json"
+    >
+
+    <button id="importButton" disabled>
+      Import into Production
+    </button>
+
+    <progress
+      id="progress"
+      class="hidden"
+      value="0"
+      max="100">
+    </progress>
+
+    <div id="status"></div>
+
+  </div>
+
+</div>
+
+<script>
+
+const CLOUDKIT_CONTAINER =
+  "iCloud.dev.rainbox.OutSketched";
+
+const CLOUDKIT_PRODUCTION_API_TOKEN =
+  "f5e7c0da6d93b2c0802f601430b4082e418b921e72cfcc3fde72a7c116fffee2";
+
+CloudKit.configure({
+  locale: "en-us",
+
+  containers: [{
+    containerIdentifier: CLOUDKIT_CONTAINER,
+
+    apiTokenAuth: {
+      apiToken: CLOUDKIT_PRODUCTION_API_TOKEN,
+      persist: true,
+
+      signInButton: {
+        id: "apple-sign-in-button",
+        theme: "black"
+      },
+
+      signOutButton: {
+        id: "apple-sign-out-button",
+        theme: "black"
+      }
+    },
+
+    environment: "production"
+  }]
+});
+
+const container = CloudKit.getDefaultContainer();
+const database = container.publicCloudDatabase;
+
+const migrationCard =
+  document.getElementById("migrationCard");
+
+const fileInput =
+  document.getElementById("jsonFile");
+
+const importButton =
+  document.getElementById("importButton");
+
+const status =
+  document.getElementById("status");
+
+const progress =
+  document.getElementById("progress");
+
+let importedJSON = null;
+
+
+// MARK: - Authentication
+
+container.setUpAuth()
+  .then(userIdentity => {
+    updateAuthUI(userIdentity);
+  })
+  .catch(error => {
+    console.error(error);
+    status.textContent =
+      "Could not initialize CloudKit authentication.";
+  });
+
+
+container.whenUserSignsIn().then(userIdentity => {
+  updateAuthUI(userIdentity);
+});
+
+
+container.whenUserSignsOut().then(() => {
+  updateAuthUI(null);
+});
+
+
+function updateAuthUI(userIdentity) {
+
+  if (userIdentity) {
+    migrationCard.classList.remove("hidden");
+  } else {
+    migrationCard.classList.add("hidden");
+  }
+}
+
+
+// MARK: - File loading
+
+fileInput.addEventListener("change", async event => {
+
+  importedJSON = null;
+  importButton.disabled = true;
+  status.textContent = "";
+
+  const file = event.target.files?.[0];
+
+  if (!file) {
+    return;
+  }
+
+  try {
+
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+
+    if (!Array.isArray(parsed)) {
+      throw new Error("JSON root is not an array.");
+    }
+
+    const valid = parsed.every(word =>
+      typeof word.text === "string" &&
+      typeof word.category === "string" &&
+      (word.enabled === 0 || word.enabled === 1)
+    );
+
+    if (!valid) {
+      throw new Error(
+        "One or more words have an invalid format."
+      );
+    }
+
+    importedJSON = parsed;
+
+    status.textContent =
+      `Ready to import ${parsed.length} words into Production.`;
+
+    importButton.disabled = false;
+
+  } catch (error) {
+
+    console.error(error);
+
+    status.textContent =
+      `Could not read export:\n${error.message}`;
+  }
+});
+
+
+// MARK: - Import
+
+importButton.addEventListener("click", async () => {
+
+  if (!importedJSON?.length) {
+    return;
+  }
+
+  const confirmed = confirm(
+    `Import ${importedJSON.length} words into the PRODUCTION CloudKit database?`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  importButton.disabled = true;
+  fileInput.disabled = true;
+
+  progress.classList.remove("hidden");
+  progress.value = 0;
+
+  try {
+
+    status.textContent =
+      "Checking Production for existing words…";
+
+    const existingRecords =
+      await fetchAllProductionWords();
+
+    const existingKeys = new Set(
+      existingRecords.map(record =>
+        normalizedKey(
+          record.fields?.category?.value ?? "",
+          record.fields?.text?.value ?? ""
+        )
+      )
+    );
+
+    const wordsToImport =
+      importedJSON.filter(word =>
+        !existingKeys.has(
+          normalizedKey(word.category, word.text)
+        )
+      );
+
+    const skipped =
+      importedJSON.length - wordsToImport.length;
+
+    status.textContent =
+      `Production currently contains ${existingRecords.length} words.\n` +
+      `${wordsToImport.length} will be created.\n` +
+      `${skipped} already exist and will be skipped.`;
+
+    if (wordsToImport.length === 0) {
+
+      progress.value = 100;
+
+      status.textContent +=
+        "\n\nNothing to import.";
+
+      return;
+    }
+
+    const batchSize = 100;
+
+    let created = 0;
+
+    for (
+      let start = 0;
+      start < wordsToImport.length;
+      start += batchSize
+    ) {
+
+      const batch =
+        wordsToImport.slice(
+          start,
+          start + batchSize
+        );
+
+      const records = batch.map(word => ({
+        recordType: "Word",
+
+        fields: {
+
+          text: {
+            value: word.text
+          },
+
+          category: {
+            value: word.category
+          },
+
+          enabled: {
+            value: Number(word.enabled)
+          }
+
+        }
+      }));
+
+      const response =
+        await database.saveRecords(records);
+
+      created +=
+        response.records?.length ?? batch.length;
+
+      const percent =
+        Math.round(
+          (created / wordsToImport.length) * 100
+        );
+
+      progress.value = percent;
+
+      status.textContent =
+        `Importing into Production…\n\n` +
+        `${created} / ${wordsToImport.length} created`;
+    }
+
+
+    // Verify after import
+
+    status.textContent +=
+      "\n\nVerifying Production…";
+
+    const finalRecords =
+      await fetchAllProductionWords();
+
+    progress.value = 100;
+
+    status.textContent =
+      `Migration complete ✓\n\n` +
+      `Exported Development words: ${importedJSON.length}\n` +
+      `Created this run: ${created}\n` +
+      `Skipped existing: ${skipped}\n` +
+      `Production Word records: ${finalRecords.length}`;
+
+    console.log(
+      `[Migration] Production now contains ${finalRecords.length} Word records`
+    );
+
+  } catch (error) {
+
+    console.error(
+      "[Migration] Failed:",
+      error
+    );
+
+    status.textContent =
+      `Migration stopped.\n\n` +
+      `No existing Production records were deleted.\n\n` +
+      `${error.message ?? error}`;
+
+    importButton.disabled = false;
+    fileInput.disabled = false;
+  }
+});
+
+
+// MARK: - Production query
+
+async function fetchAllProductionWords() {
+
+  let response =
+    await database.performQuery({
+      recordType: "Word"
+    });
+
+  let records =
+    [...(response.records || [])];
+
+  while (
+    response.moreComing ||
+    response.continuationMarker
+  ) {
+
+    response =
+      await database.performQuery(response);
+
+    if (response.records?.length) {
+      records.push(...response.records);
+    }
+  }
+
+  return records;
+}
+
+
+// MARK: - Helpers
+
+function normalizedKey(category, text) {
+
+  return (
+    category.trim().toLowerCase() +
+    "|" +
+    text.trim().toLowerCase()
+  );
+}
+
+</script>
+
+</body>
+</html>
