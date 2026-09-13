@@ -156,6 +156,14 @@
       margin: 0;
     }
 
+    .loading-status {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      padding: 50px 20px;
+      color: var(--text);
+    }
+
     .words-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -404,6 +412,10 @@
         <div id="status"></div>
       </div>
       
+      <div id="loadingStatus" class="loading-status hidden">
+        Loading words…
+      </div>
+
       <div id="wordSections"></div>
 
     </section>
@@ -698,7 +710,15 @@
     */
 
     async function loadWords() {
-      setStatus("Loading words…");
+      
+      const loadingStatus =
+        document.getElementById("loadingStatus");
+
+      const wordSections =
+        document.getElementById("wordSections");
+
+      loadingStatus.classList.remove("hidden");
+      wordSections.classList.add("hidden");
 
       try {
         let response = await database.performQuery({
@@ -740,6 +760,9 @@
 
         renderWords();
 
+        loadingStatus.classList.add("hidden");
+        wordSections.classList.remove("hidden");
+
         console.log(
           `[WordBank Admin] Loaded ${allWords.length} CloudKit words`
         );
@@ -747,6 +770,9 @@
         setStatus("");
 
       } catch (error) {
+
+        loadingStatus.classList.add("hidden");
+
         console.error(
           "[WordBank Admin] Failed to load words:",
           error
