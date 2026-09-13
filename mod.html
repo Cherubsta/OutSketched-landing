@@ -156,13 +156,15 @@
       margin: 0;
     }
 
-    .loading-status {
+    .loading-card {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 12px;
-      padding: 50px 20px;
+
+      min-height: 260px;
+      padding: 60px 20px;
 
       font-size: 18px;
       font-weight: 400;
@@ -432,10 +434,12 @@
         <div id="status"></div>
       </div>
       
-      <div id="loadingStatus" class="loading-status hidden">
+      <div id="loadingStatus" class="loading-card card hidden">
         <div class="spinner"></div>
         <div>Loading words…</div>
       </div>
+
+      <div id="wordSections"></div>
 
       <div id="wordSections"></div>
 
