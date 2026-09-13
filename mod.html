@@ -96,6 +96,11 @@
       </div>
     </section>
 
+    <!-- // TEMP -->
+    <button id="exportWordsButton" class="secondary">
+      Export Development Words
+    </button>
+
     <section>
       <div id="apple-sign-out-button"></div>
     </section>
@@ -103,6 +108,7 @@
   </main>
 
   <script>
+    
     /*
       ---------------------------------------------------
       CONFIGURATION
@@ -113,6 +119,9 @@
 
     // Create this in CloudKit Console → API Access.
     const CLOUDKIT_API_TOKEN = "faed4f2d018dac07c5ecf2bf50af0c1ecad8c9e457b10a1f2f2739e531e8dd8e";
+
+    const CLOUDKIT_PRODUCTION_API_TOKEN =
+      "f5e7c0da6d93b2c0802f601430b4082e418b921e72cfcc3fde72a7c116fffee2";
 
     const CLOUDKIT_ENVIRONMENT = "development";
 
@@ -1185,6 +1194,39 @@
         }
 
       });
+
+      // TEMP
+      document
+        .getElementById("exportWordsButton")
+        .addEventListener("click", exportDevelopmentWords);
+
+      function exportDevelopmentWords() {
+        const exportData = allWords.map(word => ({
+          text: word.text,
+          category: word.category,
+          enabled: word.enabled ? 1 : 0
+        }));
+
+        const blob = new Blob(
+          [JSON.stringify(exportData, null, 2)],
+          { type: "application/json" }
+        );
+
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "outsketched-wordbank-development.json";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        URL.revokeObjectURL(url);
+
+        console.log(
+          `[WordBank Export] Exported ${exportData.length} words`
+        );
+      }
 
   </script>
 
