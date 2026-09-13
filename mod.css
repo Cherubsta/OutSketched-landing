@@ -109,6 +109,11 @@ button {
   min-height: 20px;
 }
 
+#authStatus {
+  color: var(--muted);
+  padding-top: 12px;
+}
+
 .category {
   margin-top: 30px;
 }
