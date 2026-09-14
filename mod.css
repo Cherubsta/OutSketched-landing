@@ -103,6 +103,19 @@ button {
   margin-bottom: 6px;
 }
 
+.add-action {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-hint {
+  max-width: 220px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
 #status {
   margin-top: 12px;
   color: var(--muted);

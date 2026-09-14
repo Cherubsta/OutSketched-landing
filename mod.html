@@ -37,32 +37,23 @@
 
     <section id="editor" class="hidden">
       <div class="card">
-        <div class="toolbar">
+        <div class="field">
+          <label for="newWords">Add or Find Word(s)</label>
 
           <div class="search-wrap">
-            <input
-              id="searchInput"
-              type="search"
-              placeholder="Search all words…"
-            >
+            <textarea
+              id="newWords"
+              placeholder="Type or paste words, separated by commas…"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck="false"
+            ></textarea>
+
             <div
               id="searchSuggestions"
               class="search-suggestions hidden">
             </div>
           </div>
-
-          <strong id="totalCount"></strong>
-
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="field">
-          <label for="newWords">Add Word(s)</label>
-          <textarea
-            id="newWords"
-            placeholder="dragon, knight, drawbridge, treasure chest"
-          ></textarea>
         </div>
 
         <div class="row" style="margin-top:12px;">
@@ -70,20 +61,30 @@
             <label for="categorySelect">Category</label>
             <select id="categorySelect"></select>
           </div>
+
           <div></div>
-          <button id="addButton" class="primary">
-            Add Words
-          </button>
+
+          <div class="add-action">
+            <button id="addButton" class="primary">
+              Add Words
+            </button>
+            <div class="add-hint">
+              Duplicates are skipped automatically.
+            </div>
+          </div>
         </div>
+
         <div id="status"></div>
+
+        <div class="word-bank-meta">
+          <strong id="totalCount"></strong>
+        </div>
       </div>
-      
+
       <div id="loadingStatus" class="loading-card card hidden">
         <div class="spinner"></div>
         <div>Loading words…</div>
       </div>
-
-      <div id="wordSections"></div>
 
       <div id="wordSections"></div>
 
@@ -478,7 +479,7 @@
       const incoming =
         raw
           .split(",")
-          .map(word => word.trim())
+          .map(word => word.trim().toLowerCase())
           .filter(Boolean);
 
 
@@ -1069,17 +1070,22 @@
       );
 
     // Event listeners
+    // Add / find word autosuggest
     document
-      .getElementById("searchInput")
+      .getElementById("newWords")
       .addEventListener("input", function () {
 
-        const search =
-          this.value.trim().toLowerCase();
-
         const suggestions =
-          document.getElementById(
-            "searchSuggestions"
-          );
+          document.getElementById("searchSuggestions");
+
+        const activeWord =
+          this.value
+            .split(",")
+            .pop()
+            .trim();
+
+        const search =
+          activeWord.toLowerCase();
 
         if (!search) {
           suggestions.classList.add("hidden");
@@ -1098,14 +1104,6 @@
 
         suggestions.innerHTML = "";
 
-        const exactMatch =
-          allWords.some(
-            word =>
-              word.text
-                .trim()
-                .toLowerCase() === search
-          );
-
         for (const word of matches) {
 
           const item =
@@ -1119,73 +1117,41 @@
 
           item.addEventListener(
             "click",
-            () => editWord(word)
+            () => {
+              suggestions.classList.add("hidden");
+              editWord(word);
+            }
           );
 
           suggestions.append(item);
         }
 
-        if (!exactMatch) {
-
-          const addItem =
-            document.createElement("div");
-
-          addItem.className =
-            "search-suggestion";
-
-          addItem.innerHTML =
-            `<strong>+ Add "${this.value.trim()}"</strong>`;
-
-          addItem.addEventListener(
-            "click",
-            () => {
-
-              const word =
-                this.value.trim();
-
-              document.getElementById(
-                "newWords"
-              ).value = word;
-
-              this.blur();
-
-              suggestions.classList.add(
-                "hidden"
-              );
-
-              document.getElementById(
-                "newWords"
-              ).scrollIntoView({
-                behavior: "smooth",
-                block: "center"
-              });
-            }
-          );
-
-          suggestions.append(addItem);
-        }
-
-        suggestions.classList.remove("hidden");
-
-      });
-
-      document.addEventListener("pointerdown", function (event) {
-
-        const searchWrap =
-          document.querySelector(".search-wrap");
-
-        const searchInput =
-          document.getElementById("searchInput");
-
-        const suggestions =
-          document.getElementById("searchSuggestions");
-
-        if (!searchWrap.contains(event.target)) {
-          searchInput.blur();
+        if (matches.length) {
+          suggestions.classList.remove("hidden");
+        } else {
           suggestions.classList.add("hidden");
         }
 
       });
+
+    // Dismiss suggestions when tapping elsewhere
+    document.addEventListener("pointerdown", function (event) {
+
+      const searchWrap =
+        document.querySelector(".search-wrap");
+
+      const wordInput =
+        document.getElementById("newWords");
+
+      const suggestions =
+        document.getElementById("searchSuggestions");
+
+      if (!searchWrap.contains(event.target)) {
+        wordInput.blur();
+        suggestions.classList.add("hidden");
+      }
+
+    });
 
   </script>
 
