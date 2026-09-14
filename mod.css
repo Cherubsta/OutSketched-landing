@@ -124,6 +124,7 @@ button {
 
 #status:not(:empty) {
   margin-bottom: 16px;
+  color: #2e7d32;
 }
 
 #authStatus {
