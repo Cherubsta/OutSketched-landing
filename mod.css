@@ -122,6 +122,10 @@ button {
   min-height: 20px;
 }
 
+#status:not(:empty) {
+  margin-bottom: 16px;
+}
+
 #authStatus {
   color: var(--muted);
   padding-top: 12px;
