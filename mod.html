@@ -755,6 +755,27 @@
             return;
           }
 
+          const normalizedText =
+            trimmed.toLowerCase();
+
+          const selectedCategory =
+            categorySelect.value;
+
+          const duplicate =
+            allWords.some(existingWord =>
+              existingWord.record.recordName !== word.record.recordName &&
+              existingWord.category === selectedCategory &&
+              existingWord.text.trim().toLowerCase() === normalizedText
+            );
+
+          if (duplicate) {
+            setStatus(
+              `"${normalizedText}" already exists in ${selectedCategory}.`,
+              true
+            );
+            return;
+          }
+
           const updatedRecord = {
             ...word.record,
 
@@ -762,11 +783,11 @@
               ...word.record.fields,
 
               text: {
-                value: trimmed
+                value: normalizedText
               },
 
               category: {
-                value: categorySelect.value
+                value: selectedCategory
               },
 
               enabled: {

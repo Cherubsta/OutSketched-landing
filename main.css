@@ -1,15 +1,11 @@
 :root {
   --paper: #FFF8D9;
   --paper-light: #FFFDF2;
-
   --ink: #2D3142;
   --deep: #5A4A3F;
-
   --red: #F45050;
   --blue: #47557F;
-  
   --cta: #E96B5C;
-
   --muted: #6E6A5A;
   --border: rgba(45, 49, 66, 0.16);
 }
@@ -65,10 +61,7 @@ h3 {
 .how-panel h2,
 .tv-section h2,
 .final-cta h2 {
-  font-family:
-    "Luminari-Regular",
-    "Luminari",
-    serif;
+  font-family: "Luminari", serif;
   font-weight: 400;
 }
 
@@ -81,9 +74,7 @@ h3 {
   position: sticky;
   top: 0;
   z-index: 100;
-
   height: 0;
-
   pointer-events: none;
 }
 
@@ -95,21 +86,15 @@ h3 {
 .header-download {
   position: relative;
   top: 18px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   height: 34px;
   padding: 0 14px;
-
   border-width: 3px;
-
   font-size: 0.82rem;
   line-height: 1;
-
   pointer-events: auto;
-
   opacity: 0;
   animation: showHeaderDownload 0.4s ease 2.9s forwards;
 }
@@ -122,7 +107,6 @@ h3 {
 /* -------------------------
    HERO
 -------------------------- */
-
 .hero {
   position: relative;
   padding: 32px 0 70px;
@@ -148,12 +132,7 @@ h3 {
 .hero-title {
   max-width: 1000px;
   margin: 0 auto 26px;
-
-  font-family:
-    "Luminari-Regular",
-    "Luminari",
-    serif;
-
+  font-family: "Luminari", serif;
   font-size: clamp(4rem, 9vw, 7.5rem);
   font-weight: 400;
   line-height: 0.95;
@@ -161,9 +140,7 @@ h3 {
 
 .hero-copy {
   max-width: 650px;
-
   margin: 28px auto 30px;
-
   font-size: 1.25rem;
   line-height: 1.5;
 }
@@ -172,20 +149,16 @@ h3 {
 /* -------------------------
    MAIN GAMEPLAY VISUAL
 -------------------------- */
-
 .hero-visual-wrapper {
   width: 100%;
   max-width: 750px;
-
   margin: 0 auto;
 }
 
 .hero-gameplay {
   display: block;
-
   width: 100%;
   height: auto;
-
   object-fit: contain;
 }
 
@@ -193,22 +166,16 @@ h3 {
 /* -------------------------
    OPENING WORDMARK
 -------------------------- */
-
 .hero-intro {
   position: fixed;
   inset: 0;
   z-index: 200;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 0;
-
   background: var(--paper);
-
   pointer-events: none;
-
   animation: heroIntroFade 3.2s ease forwards;
 }
 
@@ -217,7 +184,6 @@ h3 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   animation: heroIntroTitle 3.2s ease forwards;
 }
 
@@ -228,11 +194,7 @@ h3 {
 }
 
 .hero-intro-title {
-  font-family:
-    "Luminari-Regular",
-    "Luminari",
-    serif;
-
+  font-family: "Luminari", serif;
   font-size: clamp(4.5rem, 13vw, 11rem);
   line-height: 0.95;
 }
@@ -297,20 +259,14 @@ h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   background: var(--red);
   color: var(--paper-light);
-
   border: 3px solid var(--red);
   border-radius: 999px;
-
   padding: 12px 22px;
-
   font-weight: 800;
   line-height: 1;
-
   box-shadow: 4px 4px 0 var(--deep);
-
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
@@ -321,7 +277,6 @@ h3 {
   background: var(--deep);
   border-color: var(--deep);
   color: var(--paper-light);
-
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0 var(--deep);
 }
@@ -338,14 +293,12 @@ h3 {
 
 .section-heading h2 {
   margin-bottom: 14px;
-
   font-size: clamp(3rem, 6vw, 4.6rem);
   line-height: 1;
 }
 
 .section-heading p {
   margin: 0;
-
   font-size: 1.18rem;
   line-height: 1.5;
 }
@@ -361,10 +314,8 @@ h3 {
 
 .modes-section {
   padding: 120px 0 90px;
-
   background: var(--deep);
   color: var(--paper);
-
   border-top: 2px solid var(--ink);
   border-bottom: 2px solid var(--ink);
 }
@@ -381,16 +332,12 @@ h3 {
   position: relative;
   display: flex;
   flex-direction: column;
-
   width: 100%;
   padding: 30px;
-
   background: var(--paper-light);
   color: var(--deep);
-
   border: 2px solid var(--ink);
   border-radius: 22px;
-
   box-shadow: 6px 6px 0 var(--ink);
 }
 
@@ -398,7 +345,6 @@ h3 {
   position: absolute;
   top: 20px;
   right: 22px;
-
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -406,21 +352,18 @@ h3 {
 
 .mode-icon {
   margin-bottom: 22px;
-
   font-size: 2.1rem;
   color: var(--blue);
 }
 
 .mode-card h3 {
   margin-bottom: 5px;
-
   font-size: 2.4rem;
   line-height: 1.05;
 }
 
 .mode-players {
   margin-bottom: 20px;
-
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.11em;
@@ -428,7 +371,6 @@ h3 {
 
 .mode-card p {
   margin-bottom: 14px;
-
   font-size: 1rem;
   line-height: 1.55;
 }
@@ -436,7 +378,6 @@ h3 {
 .mode-tag {
   margin-top: auto;
   padding-top: 16px;
-
   font-weight: 700;
   font-size: 0.9rem;
 }
@@ -478,21 +419,16 @@ h3 {
 .how-panel h2 {
   margin-bottom: 50px;
   color: var(--deep);
-
   font-size: clamp(3rem, 6vw, 4.6rem);
 }
 
 .how-step {
   height: 100%;
   max-width: none;
-
   padding: 30px 24px;
-
   background: var(--paper-light);
-
   border: 2px solid var(--deep);
   border-radius: 20px;
-
   box-shadow: 5px 5px 0 var(--deep);
 }
 
@@ -500,16 +436,12 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 46px;
   height: 46px;
   margin: 0 auto 20px;
-
   background: var(--deep);
   color: var(--paper-light);
-
   border-radius: 50%;
-
   font-weight: 800;
 }
 
@@ -528,10 +460,8 @@ h3 {
 
 .tv-section {
   padding: 100px 0;
-
   background: var(--blue);
   color: var(--paper-light);
-
   border-top: none;
   border-bottom: none;
 }
@@ -569,7 +499,6 @@ h3 {
 
 .final-cta {
   padding: 110px 0;
-
   background: var(--cta);
   color: var(--paper-light);
 }
@@ -639,13 +568,8 @@ footer,
 .footer {
   background: var(--white);
   border-top: 1px solid rgba(0, 0, 0, 0.08);
-
   color: #777;
-
-  font-family:
-    "Luminari-Regular",
-    "Luminari",
-    serif;
+  font-family: "Luminari", serif;     
 }
 
 .footer {
@@ -677,13 +601,10 @@ footer,
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     height: 38px;
     padding: 0 18px;
     margin-top: 4px;
-
     border-width: 3px;
-
     font-size: 0.9rem;
     line-height: 1;
   }
@@ -703,14 +624,11 @@ footer,
 
   .hero-intro-content {
     width: 88vw;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     text-align: center;
-
     animation: heroIntroTitle 3.2s ease forwards;
   }
 
@@ -778,7 +696,6 @@ footer,
 -------------------------- */
 
 @media (max-width: 576px) {
-
   .hero-title {
     font-size: clamp(5.0rem, 17vw, 4.7rem);
   }
