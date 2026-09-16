@@ -100,18 +100,27 @@
       </div>
 
       <h1 class="hero-title">
-        Draw fast.<br>
-        Guess faster.
+        <span class="hero-word">Draw</span>
+        <span class="hero-word">fast.</span>
+        <span class="hero-word">Guess</span>
+        <span class="hero-word">faster.</span>
       </h1>
 
 
       <!-- Main gameplay visual -->
       <div class="hero-visual-wrapper">
-        <img
-          src="assets/hero-2.png"
-          class="hero-gameplay"
-          alt="A drawing being sketched during a game of OutSketched"
-        >
+        <picture>
+          <source
+            media="(max-width: 768px)"
+            srcset="assets/hero-gif-mobile.gif"
+          >
+
+          <img
+            src="assets/hero-gif.gif"
+            class="hero-gameplay"
+            alt="A drawing being sketched during a game of OutSketched"
+          >
+        </picture>
       </div>
 
       <p class="hero-copy">
