@@ -14,7 +14,6 @@
 /* -------------------------
    FONTS
 -------------------------- */
-
 @font-face {
   font-family: "Luminari";
   src: url("assets/Luminari.ttf") format("truetype");
@@ -27,7 +26,6 @@
 /* -------------------------
    GLOBAL
 -------------------------- */
-
 html,
 body {
   margin: 0;
@@ -54,7 +52,6 @@ h3 {
 /* -------------------------
    DISPLAY TYPOGRAPHY
 -------------------------- */
-
 .hero-title,
 .section-heading h2,
 .mode-card h3,
@@ -69,7 +66,6 @@ h3 {
 /* -------------------------
    HEADER / DOWNLOAD
 -------------------------- */
-
 .site-header {
   position: sticky;
   top: 0;
@@ -257,20 +253,16 @@ h3 {
 
 
 /* Respect reduced-motion preference */
-
 @media (prefers-reduced-motion: reduce) {
 
   .hero-intro {
     display: none;
   }
-
 }
-
 
 /* -------------------------
    APP STORE BUTTON
 -------------------------- */
-
 .btn-appstore {
   display: inline-flex;
   align-items: center;
@@ -301,7 +293,6 @@ h3 {
 /* -------------------------
    SECTION HEADINGS
 -------------------------- */
-
 .section-heading {
   max-width: 720px;
   margin: 0 auto 48px;
@@ -327,7 +318,6 @@ h3 {
 /* -------------------------
    GAME MODES
 -------------------------- */
-
 .modes-section {
   padding: 120px 0 90px;
   background: var(--deep);
@@ -414,7 +404,6 @@ h3 {
 /* -------------------------
    HOW IT WORKS
 -------------------------- */
-
 .how-section {
   padding: 100px 0;
   background: var(--paper);
@@ -473,7 +462,6 @@ h3 {
 /* -------------------------
    TV SECTION
 -------------------------- */
-
 .tv-section {
   padding: 100px 0;
   background: var(--blue);
@@ -484,14 +472,26 @@ h3 {
 
 .tv-section .section-kicker {
   color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 18px;
 }
 
 .tv-section h2 {
   color: var(--paper-light);
+  margin: 0 0 26px;
+  line-height: 1.08;
 }
 
 .tv-copy {
   color: rgba(255, 255, 255, 0.88);
+  margin: 0;
+  line-height: 1.65;
+}
+
+.tv-signoff {
+  margin: 28px 0 0;
+  color: var(--paper-light);
+  font-weight: 700;
+  line-height: 1.5;
 }
 
 .tv-image-wrap {
@@ -512,7 +512,6 @@ h3 {
 /* -------------------------
    FINAL CTA
 -------------------------- */
-
 .final-cta {
   padding: 110px 0;
   background: var(--cta);
@@ -526,14 +525,19 @@ h3 {
 
 .final-cta .section-kicker {
   color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 20px;
 }
 
 .final-cta h2 {
   color: var(--paper-light);
+  margin: 0 auto 28px;
+  line-height: 1.1;
 }
 
 .final-cta p {
   color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 34px;
+  line-height: 1.7;
 }
 
 .final-cta .btn-appstore {
@@ -552,7 +556,6 @@ h3 {
 /* -------------------------
    PRIVACY
 -------------------------- */
-
 .privacy {
   max-width: 800px;
   margin: 60px auto;
@@ -579,7 +582,6 @@ h3 {
 /* -------------------------
    FOOTER
 -------------------------- */
-
 footer,
 .footer {
   background: var(--white);
@@ -605,7 +607,6 @@ footer,
 /* -------------------------
    TABLET / MOBILE
 -------------------------- */
-
 @media (max-width: 768px) {
 
   .site-header {
@@ -705,7 +706,6 @@ footer,
 /* -------------------------
    SMALL MOBILE
 -------------------------- */
-
 @media (max-width: 576px) and (orientation: portrait) {
   .hero-title {
     font-size: clamp(3.2rem, 16vw, 4.4rem);
