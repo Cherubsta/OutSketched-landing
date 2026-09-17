@@ -111,7 +111,6 @@
       CONFIGURATION
       ---------------------------------------------------
     */
-
     const CLOUDKIT_CONTAINER = "iCloud.dev.rainbox.OutSketched";
 
     // Create this in CloudKit Console → API Access.
@@ -121,7 +120,6 @@
 
     const ADMIN_PASSWORD_HASH =
       "e9ea17b5ccd46a0497599f0d594517fbf1764bdddc7336af6107fb167a1a153a";
-
 
     const CATEGORIES = [
       "Everyday Objects",
@@ -140,7 +138,6 @@
       LOCAL PASSWORD GATE
       ---------------------------------------------------
     */
-
     const ADMIN_AUTH_KEY = "outsketched_wordbank_admin";
 
     async function sha256(text) {
@@ -182,7 +179,6 @@
       }
     }
 
-
     function showApp() {
 
       document.getElementById("loginCard")
@@ -193,7 +189,6 @@
 
       initializeCloudKit();
     }
-
 
     document.getElementById("passwordButton")
       .addEventListener("click", attemptPassword);
@@ -208,7 +203,6 @@
 
       });
 
-
     if (
       localStorage.getItem(ADMIN_AUTH_KEY) ===
       ADMIN_PASSWORD_HASH
@@ -222,12 +216,10 @@
       CLOUDKIT
       ---------------------------------------------------
     */
-
     let container;
     let database;
 
     let allWords = [];
-
 
     window.addEventListener(
       "cloudkitloaded",
@@ -247,44 +239,30 @@
         // CloudKit script may still be loading.
         setTimeout(initializeCloudKit, 100);
         return;
-
       }
 
       CloudKit.configure({
-
         locale: "en-us",
-
         containers: [{
-
           containerIdentifier:
             CLOUDKIT_CONTAINER,
-
           apiTokenAuth: {
-
             apiToken:
               CLOUDKIT_API_TOKEN,
-
             persist: true,
-
             signInButton: {
               id: "apple-sign-in-button",
               theme: "black"
             },
-
             signOutButton: {
               id: "apple-sign-out-button",
               theme: "black"
             }
-
           },
-
           environment:
             CLOUDKIT_ENVIRONMENT
-
         }]
-
       });
-
 
       container =
         CloudKit.getDefaultContainer();
@@ -292,88 +270,60 @@
       database =
         container.publicCloudDatabase;
 
-
       try {
-
         const identity =
           await container.setUpAuth();
 
         handleIdentity(identity);
 
-
         container.whenUserSignsIn()
           .then(identity => {
 
             handleIdentity(identity);
-
           });
-
 
         container.whenUserSignsOut()
           .then(() => {
-
             handleIdentity(null);
-
           });
 
-
       } catch (error) {
-
         console.error(error);
-
         document.getElementById("authStatus")
           .textContent =
           "Unable to initialize iCloud authentication.";
-
       }
-
     }
-
 
     async function handleIdentity(identity) {
 
       const authStatus =
         document.getElementById("authStatus");
-
       const editor =
         document.getElementById("editor");
 
-
       if (!identity) {
-
         authStatus.textContent =
           "Sign in to iCloud to manage words.";
-
         editor.classList.add("hidden");
-
         return;
-
       }
-
 
       authStatus.textContent =
         "Signed in to iCloud.";
 
       editor.classList.remove("hidden");
 
-
       try {
-
         await loadWords();
-
       } catch (error) {
-
         console.error(error);
-
         setStatus(
           "Could not load words from CloudKit.",
           true
         );
-
       }
-
     }
-
 
     /*
       ---------------------------------------------------
@@ -613,7 +563,6 @@
       EDIT
       ---------------------------------------------------
     */
-
     async function editWord(word) {
       const existing =
         document.getElementById("wordEditOverlay");
@@ -872,7 +821,6 @@
       DELETE
       ---------------------------------------------------
     */
-
     async function deleteWord(word) {
 
       const confirmed =
@@ -919,7 +867,6 @@
       RENDER
       ---------------------------------------------------
     */
-
     function renderWords() {
 
       const container =
@@ -1047,7 +994,6 @@
       UI HELPERS
       ---------------------------------------------------
     */
-
     function populateCategories() {
 
       const select =
@@ -1073,7 +1019,6 @@
 
     }
 
-
     function setStatus(
       message,
       isError = false
@@ -1092,9 +1037,7 @@
 
     }
 
-
     populateCategories();
-
 
     document.getElementById("addButton")
       .addEventListener(
@@ -1185,7 +1128,6 @@
       }
 
     });
-
   </script>
 
 
