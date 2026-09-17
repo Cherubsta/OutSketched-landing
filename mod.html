@@ -46,7 +46,7 @@
               placeholder="Loading word bank…"
               autocapitalize="none"
               autocorrect="off"
-              spellcheck="false"
+              spellcheck="true"
               disabled
             ></textarea>
 
@@ -326,17 +326,26 @@
     }
 
     /*
-      ---------------------------------------------------
-      LOAD WORDS
-      ---------------------------------------------------
+  ---------------------------------------------------
+  LOAD WORDS
+  ---------------------------------------------------
     */
     async function loadWords() {
-      
+
       const loadingStatus =
         document.getElementById("loadingStatus");
 
       const wordSections =
         document.getElementById("wordSections");
+
+      const newWordsField =
+        document.getElementById("newWords");
+
+      // Disable Add/Find while the word bank is loading
+      // or refreshing.
+      newWordsField.disabled = true;
+      newWordsField.placeholder =
+        "Loading word bank…";
 
       loadingStatus.classList.remove("hidden");
       wordSections.classList.add("hidden");
@@ -348,8 +357,12 @@
 
         let records = [...(response.records || [])];
 
-        while (response.moreComing || response.continuationMarker) {
-          response = await database.performQuery(response);
+        while (
+          response.moreComing ||
+          response.continuationMarker
+        ) {
+          response =
+            await database.performQuery(response);
 
           if (response.records?.length) {
             records.push(...response.records);
@@ -390,8 +403,8 @@
 
         setStatus("");
 
-        const newWordsField = document.getElementById("newWords");
-
+        // Word bank is fully refreshed.
+        // Add/Find is safe to use again.
         newWordsField.disabled = false;
         newWordsField.placeholder =
           "Type or paste words, separated by commas…";
@@ -400,9 +413,9 @@
 
         loadingStatus.classList.add("hidden");
 
-        const newWordsField =
-          document.getElementById("newWords");
-
+        // Keep Add/Find disabled if the word bank
+        // could not be loaded.
+        newWordsField.disabled = true;
         newWordsField.placeholder =
           "Word bank unavailable";
 
@@ -420,13 +433,11 @@
       }
     }
 
-
     /*
       ---------------------------------------------------
       ADD WORDS
       ---------------------------------------------------
     */
-
     async function addWords() {
 
       const raw =
@@ -437,19 +448,16 @@
         document.getElementById("categorySelect")
           .value;
 
-
       const incoming =
         raw
           .split(",")
           .map(word => word.trim().toLowerCase())
           .filter(Boolean);
 
-
       if (!incoming.length) {
         setStatus("Enter at least one word.", true);
         return;
       }
-
 
       const uniqueIncoming =
         [...new Map(
@@ -458,7 +466,6 @@
             word
           ])
         ).values()];
-
 
       const existing =
         new Set(
@@ -471,7 +478,6 @@
             )
         );
 
-
       const toAdd =
         uniqueIncoming.filter(
           word =>
@@ -480,20 +486,15 @@
             )
         );
 
-
       const skipped =
         uniqueIncoming.length -
         toAdd.length;
 
-
       if (!toAdd.length) {
-
         setStatus(
           `${skipped} duplicate${skipped === 1 ? "" : "s"} skipped.`
         );
-
         return;
-
       }
 
 
@@ -501,40 +502,27 @@
         `Adding ${toAdd.length} word${toAdd.length === 1 ? "" : "s"}…`
       );
 
-
       const records =
         toAdd.map(word => ({
-
           recordType: "Word",
-
           fields: {
-
             text: {
               value: word
             },
-
             category: {
               value: category
             },
-
             enabled: {
               value: 1
             }
-
           }
-
         }));
 
-
       try {
-
         await database.saveRecords(records);
-
         document.getElementById("newWords")
           .value = "";
-
         await loadWords();
-
 
         setStatus(
           `${toAdd.length} added` +
@@ -544,18 +532,13 @@
           " ✓"
         );
 
-
       } catch (error) {
-
         console.error(error);
-
         setStatus(
           "Could not add words.",
           true
         );
-
       }
-
     }
 
     /*
@@ -580,20 +563,17 @@
       overlay.className =
         "edit-overlay";
 
-
       const panel =
         document.createElement("div");
 
       panel.className =
         "edit-panel";
 
-
       const title =
         document.createElement("h3");
 
       title.textContent =
         "Edit Word";
-
 
       const textInput =
         document.createElement("input");
@@ -604,7 +584,6 @@
       textInput.value =
         word.text;
 
-
       const categorySelect =
         document.createElement("select");
 
@@ -614,7 +593,6 @@
       enabledLabel.className =
         "edit-enabled";
 
-
       const enabledCheckbox =
         document.createElement("input");
 
@@ -623,7 +601,6 @@
 
       enabledCheckbox.checked =
         word.enabled;
-
 
       enabledLabel.append(
         enabledCheckbox,
@@ -646,33 +623,25 @@
         categorySelect.append(option);
       }
 
-
       const buttons =
         document.createElement("div");
-
       buttons.className =
         "edit-actions";
 
-
       const save =
         document.createElement("button");
-
       save.className =
         "primary";
-
       save.textContent =
         "Save";
 
 
       const cancel =
         document.createElement("button");
-
       cancel.className =
         "secondary";
-
       cancel.textContent =
         "Cancel";
-
 
       const del =
         document.createElement("button");
@@ -759,7 +728,6 @@
           };
 
           try {
-
             save.disabled = true;
             save.textContent = "Saving…";
 
@@ -784,19 +752,15 @@
               "Could not save changes.",
               true
             );
-
           }
-
         }
       );
-
 
       buttons.append(
         save,
         cancel,
         del
       );
-
 
       panel.append(
         title,
@@ -806,15 +770,12 @@
         buttons
       );
 
-
       overlay.append(panel);
-
       document.body.append(overlay);
 
       textInput.focus();
       textInput.select();
     }
-
 
     /*
       ---------------------------------------------------
@@ -822,7 +783,6 @@
       ---------------------------------------------------
     */
     async function deleteWord(word) {
-
       const confirmed =
         confirm(
           `Delete "${word.text}"?`
@@ -832,33 +792,22 @@
         return false;
       }
 
-
       try {
-
         await database.deleteRecords([
           word.record.recordName
         ]);
-
         await loadWords();
-
         setStatus("Deleted ✓");
-
         return true;
 
-
       } catch (error) {
-
         console.error(error);
-
         setStatus(
           "Could not delete word.",
           true
         );
-
         return false;
-
       }
-
     }
 
 
