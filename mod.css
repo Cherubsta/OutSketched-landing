@@ -132,6 +132,11 @@ button {
   padding-top: 12px;
 }
 
+#newWords:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .category {
   margin-top: 30px;
 }

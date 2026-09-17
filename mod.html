@@ -43,10 +43,11 @@
           <div class="search-wrap">
             <textarea
               id="newWords"
-              placeholder="Type or paste words, separated by commas…"
+              placeholder="Loading word bank…"
               autocapitalize="none"
               autocorrect="off"
               spellcheck="false"
+              disabled
             ></textarea>
 
             <div
@@ -379,7 +380,6 @@
       LOAD WORDS
       ---------------------------------------------------
     */
-
     async function loadWords() {
       
       const loadingStatus =
@@ -440,9 +440,21 @@
 
         setStatus("");
 
+        const newWordsField = document.getElementById("newWords");
+
+        newWordsField.disabled = false;
+        newWordsField.placeholder =
+          "Type or paste words, separated by commas…";
+
       } catch (error) {
 
         loadingStatus.classList.add("hidden");
+
+        const newWordsField =
+          document.getElementById("newWords");
+
+        newWordsField.placeholder =
+          "Word bank unavailable";
 
         console.error(
           "[WordBank Admin] Failed to load words:",
